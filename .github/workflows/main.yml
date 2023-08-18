@@ -1,0 +1,49 @@
+name: Deploy Vue ToDo Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+  
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v3
+  
+        - name: Setup Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18
+
+        - name: Install CDK dependencies
+          run: |
+            cd backend
+            npm ci
+
+        - name: Install Frontend dependencies
+          run: |
+            cd frontend
+            npm ci
+  
+        - name: Deploy CDK Infrastructure
+          run: |
+            cd backend
+            npx cdk deploy TwoStacksApp-CreationStack --require-approval never
+  
+        - name: Build Frontend
+          run: |
+            cd frontend
+            npm run build
+
+        - name: Upload Built Website
+          run: |
+            cd backend
+            npx cdk deploy TwoStacksApp-DeploymentStack --require-approval never
+            
