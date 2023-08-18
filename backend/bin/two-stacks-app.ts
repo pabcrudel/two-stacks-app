@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import CreationStack from '../lib/creation-stack';
+import DeploymentStack from '../lib/deployment-stack';
+
+const projectName = 'TwoStacksApp';
+
+const app = new cdk.App();
+new CreationStack(app, `${projectName}-CreationStack`, {projectName});
+new DeploymentStack(app, `${projectName}-DeploymentStack`, {projectName});
